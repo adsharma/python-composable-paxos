@@ -22,7 +22,7 @@ class ShortAsserts(object):
 
     def am(self, msg, mtype, **kwargs):
         self.ae(msg.__class__.__name__.lower(), mtype)
-        for k, v in kwargs.iteritems():
+        for k, v in kwargs.items():
             self.assertEquals(getattr(msg, k), v)
 
 
