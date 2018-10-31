@@ -67,6 +67,9 @@ class Promise(PaxosMessage):
     def __init__(
         self, from_uid, proposer_uid, proposal_id, last_accepted_id, last_accepted_value
     ):
+        if last_accepted_id == None:
+            last_accepted_id = MIN_PROPOSAL_ID
+
         self.from_uid = from_uid
         self.proposer_uid = proposer_uid
         self.proposal_id = proposal_id
@@ -80,6 +83,8 @@ class Accept(PaxosMessage):
     """
 
     def __init__(self, from_uid, proposal_id, proposal_value):
+        if proposal_id == None:
+            proposal_id = MIN_PROPOSAL_ID
         self.from_uid = from_uid
         self.proposal_id = proposal_id
         self.proposal_value = proposal_value
@@ -128,6 +133,9 @@ class MessageHandler(object):
         return handler(msg)
 
 
+MIN_PROPOSAL_ID = ProposalID(-1, "None")
+
+
 class Proposer(MessageHandler):
     """
     The 'leader' attribute is a boolean value indicating the Proposer's
@@ -139,8 +147,8 @@ class Proposer(MessageHandler):
     leader = False
     proposed_value = None
     proposal_id = None
-    highest_accepted_id = None
-    promises_received = None
+    highest_accepted_id = MIN_PROPOSAL_ID
+    promises_received = MIN_PROPOSAL_ID
     nacks_received = None
     current_prepare_msg = None
     current_accept_msg = None
@@ -252,7 +260,11 @@ class Acceptor(MessageHandler):
     """
 
     def __init__(
-        self, network_uid, promised_id=None, accepted_id=None, accepted_value=None
+        self,
+        network_uid,
+        promised_id=MIN_PROPOSAL_ID,
+        accepted_id=MIN_PROPOSAL_ID,
+        accepted_value=None,
     ):
         """
         promised_id, accepted_id, and accepted_value should be provided if and only if this
@@ -341,7 +353,7 @@ class Learner(MessageHandler):
 
         last_pn = self.acceptors.get(msg.from_uid)
 
-        if msg.proposal_id <= last_pn:
+        if last_pn is not None and msg.proposal_id <= last_pn:
             return  # Old message
 
         self.acceptors[msg.from_uid] = msg.proposal_id
@@ -383,8 +395,8 @@ class PaxosInstance(Proposer, Acceptor, Learner):
         self,
         network_uid,
         quorum_size,
-        promised_id=None,
-        accepted_id=None,
+        promised_id=MIN_PROPOSAL_ID,
+        accepted_id=MIN_PROPOSAL_ID,
         accepted_value=None,
     ):
         Proposer.__init__(self, network_uid, quorum_size)

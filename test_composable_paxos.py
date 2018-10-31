@@ -123,7 +123,7 @@ class ProposerTests(ShortAsserts, unittest.TestCase):
     def test_recv_promise_propose_value_from_null(self):
         self.p.prepare()
         self.p.prepare()
-        self.ae(self.p.highest_accepted_id, None)
+        self.ae(self.p.highest_accepted_id, PID(-1, "None"))
         self.ae(self.p.proposed_value, None)
         self.p.receive(Promise("B", "A", PID(2, "A"), PID(1, "B"), "foo"))
         self.ae(self.p.highest_accepted_id, PID(1, "B"))
@@ -162,16 +162,16 @@ class AcceptorTests(ShortAsserts, unittest.TestCase):
         self.a = Acceptor("A")
 
     def test_recv_prepare_initial(self):
-        self.ae(self.a.promised_id, None)
+        self.ae(self.a.promised_id, MIN_PROPOSAL_ID)
         self.ae(self.a.accepted_value, None)
-        self.ae(self.a.accepted_id, None)
+        self.ae(self.a.accepted_id, MIN_PROPOSAL_ID)
         m = self.a.receive(Prepare("A", PID(1, "A")))
         self.am(
             m,
             "promise",
             proposer_uid="A",
             proposal_id=PID(1, "A"),
-            last_accepted_id=None,
+            last_accepted_id=MIN_PROPOSAL_ID,
             last_accepted_value=None,
         )
 
@@ -182,7 +182,7 @@ class AcceptorTests(ShortAsserts, unittest.TestCase):
             "promise",
             proposer_uid="A",
             proposal_id=PID(1, "A"),
-            last_accepted_id=None,
+            last_accepted_id=MIN_PROPOSAL_ID,
             last_accepted_value=None,
         )
         m = self.a.receive(Prepare("A", PID(1, "A")))
@@ -191,7 +191,7 @@ class AcceptorTests(ShortAsserts, unittest.TestCase):
             "promise",
             proposer_uid="A",
             proposal_id=PID(1, "A"),
-            last_accepted_id=None,
+            last_accepted_id=MIN_PROPOSAL_ID,
             last_accepted_value=None,
         )
 
@@ -202,7 +202,7 @@ class AcceptorTests(ShortAsserts, unittest.TestCase):
             "promise",
             proposer_uid="A",
             proposal_id=PID(5, "A"),
-            last_accepted_id=None,
+            last_accepted_id=MIN_PROPOSAL_ID,
             last_accepted_value=None,
         )
         m = self.a.receive(Prepare("A", PID(1, "A")))
@@ -221,7 +221,7 @@ class AcceptorTests(ShortAsserts, unittest.TestCase):
             "promise",
             proposer_uid="A",
             proposal_id=PID(1, "A"),
-            last_accepted_id=None,
+            last_accepted_id=MIN_PROPOSAL_ID,
             last_accepted_value=None,
         )
 
@@ -251,7 +251,7 @@ class AcceptorTests(ShortAsserts, unittest.TestCase):
             "promise",
             proposer_uid="A",
             proposal_id=PID(1, "A"),
-            last_accepted_id=None,
+            last_accepted_id=MIN_PROPOSAL_ID,
             last_accepted_value=None,
         )
 
@@ -265,7 +265,7 @@ class AcceptorTests(ShortAsserts, unittest.TestCase):
             "promise",
             proposer_uid="A",
             proposal_id=PID(1, "A"),
-            last_accepted_id=None,
+            last_accepted_id=MIN_PROPOSAL_ID,
             last_accepted_value=None,
         )
 
@@ -279,7 +279,7 @@ class AcceptorTests(ShortAsserts, unittest.TestCase):
             "promise",
             proposer_uid="A",
             proposal_id=PID(5, "A"),
-            last_accepted_id=None,
+            last_accepted_id=MIN_PROPOSAL_ID,
             last_accepted_value=None,
         )
 
@@ -293,7 +293,7 @@ class AcceptorTests(ShortAsserts, unittest.TestCase):
         )
 
         self.ae(self.a.accepted_value, None)
-        self.ae(self.a.accepted_id, None)
+        self.ae(self.a.accepted_id, MIN_PROPOSAL_ID)
         self.ae(self.a.promised_id, PID(5, "A"))
 
 
